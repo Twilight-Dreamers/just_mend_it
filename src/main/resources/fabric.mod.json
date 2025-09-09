@@ -1,0 +1,41 @@
+{
+	"schemaVersion": 1,
+	"id": "just_mend_it",
+	"version": "${version}",
+	"name": "just_mend_it",
+	"description": "fork of the bettermending mod, with sfx and config support",
+	"authors": [
+		"legobmw99",
+		"danilanosikov"
+	],
+	"contact": {
+		"homepage": "https://github.com/Twilight-Dreamers/just_mend_it.git",
+		"sources": "https://github.com/Twilight-Dreamers/just_mend_it.git"
+	},
+	"license": "GPL-3.0",
+	"icon": "assets/just_mend_it/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"ru.twd.Just_mend_it"
+		],
+		"fabric-datagen": [
+			"ru.twd.Just_mend_itDataGenerator"
+		],
+		"client": [
+			"ru.twd.Just_mend_itClient"
+		]
+	},
+	"mixins": [
+		"just_mend_it.mixins.json"
+	],
+	"depends": {
+		"fabricloader": ">=0.17.2",
+		"minecraft": "~1.20.4",
+		"java": ">=17",
+		"fabric-api": "*"
+	},
+	"suggests": {
+		"another-mod": "*"
+	}
+}

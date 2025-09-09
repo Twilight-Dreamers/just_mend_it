@@ -2,9 +2,11 @@ package ru.twd;
 
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 
+import net.minecraft.sound.SoundEvents;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,6 +16,7 @@ public class Common {
 
     public static float repair_percent = 20;
     public static float repair_cost_percent = 33;
+    public static float minimum_repair_level = 8;
 
 
     public static ItemStack get_item(PlayerEntity player) { return player.getActiveItem(); }
@@ -107,12 +110,16 @@ public class Common {
     public static boolean mend(PlayerEntity player)
     {
         ItemStack item = player.getMainHandStack();
-        if (!is_fixable(item) || !is_damaged(item) || !is_sneaking(player)) return false;
+        if (!is_fixable(item) || !is_damaged(item) || !is_sneaking(player) || !is_payable(player)) return false;
         pay(player);
         repair(item);
+        player.playSound(SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP,0.75f,1f);
         return true;
     }
-
+    public static boolean is_payable(PlayerEntity player)
+    {
+        return minimum_repair_level <= player.experienceLevel;
+    }
     public static boolean is_sneaking(PlayerEntity player)
     {
         return player.isSneaking();

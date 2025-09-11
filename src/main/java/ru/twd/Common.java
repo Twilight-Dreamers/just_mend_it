@@ -3,6 +3,7 @@ package ru.twd;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.sound.SoundEvents;
@@ -27,7 +28,7 @@ public class Common {
     }
     public static float get_repair_amount(ItemStack item)
     {
-        return ((0.01f*ru.twd.Config.repairment)*get_durability(item));
+        return ((0.01f* Config.repair_amount)*get_durability(item));
     }
     public static void repair(ItemStack item)
     {
@@ -72,10 +73,13 @@ public class Common {
     }
     public static float get_repair_cost(float level)
     {
-        return (  (0.01f*ru.twd.Config.cost) * get_single_level_cost(level)  );
+        return (  (0.01f* Config.xp_cost) * get_single_level_cost(level)  );
     }
     public static float pay(PlayerEntity player)
     {
+        ItemStack offhand = player.getOffHandStack();
+        if(0 < Config.secondary_cost && Config.secondary_cost <= offhand.getCount()) offhand.decrement(Config.secondary_cost);
+
         float level,progress,remainder,base,balance,cost,new_balance,new_level,new_remainder,new_single_level_cost,new_progress;
         level = player.experienceLevel;
         progress = player.experienceProgress;
@@ -106,38 +110,53 @@ public class Common {
     /** CALCULATION ENTRY POINT **/
     public static boolean mend(PlayerEntity player)
     {
-        ItemStack item = player.getMainHandStack();
-        item.setNbt(new NbtCompound().);
-        Util.getMeasuringTimeMs();
-        if (!is_fixable(item) || !is_damaged(item) || !is_sneaking(player) || !is_payable(player)) return false;
-        pay(player);
-        repair(item);
-        play_sfx(player);
-        return true;
+        if (player.isSneaking() && is_payable(player)) {
+            ItemStack item = player.getMainHandStack();
+            if (is_fixable(item)) {
+                pay(player);
+                repair(item);
+                play_sfx(player);
+                return true;
+            }
+        }
+        return false;
     }
     public static boolean is_payable(PlayerEntity player)
     {
-        String item_name = player.getOffHandStack().getItem().getName().getString();
-        //todo:remove
-        LOGGER.info("secondary_cost_type: " + item_name);
-        LOGGER.info("secondary_cost_type_config: " + Config.secondary_cost_type);
-        if (Config.secondary_cost > 0)
-        {
-            if (!Objects.equals(Config.secondary_cost_type, item_name)) return false;
+        return has_offhand(player) && Config.level_requirement<=player.experienceLevel;
+    }
+    private static boolean has_offhand(PlayerEntity player)
+    {
+        if (0 > Config.secondary_cost) Config.secondary_cost=0;
+
+        if (0 == Config.secondary_cost) return true;
+        else {
+
+            ItemStack stack = player.getOffHandStack();
+            Item item = stack.getItem();
+
+            String offhand, target;
+            offhand = item.getTranslationKey().replace('.', ':');
+            target = "item:" + Config.secondary_cost_type;
+
+            int cost, amount;
+            cost = Config.secondary_cost;
+            amount = stack.getCount();
+
+            boolean match, enough;
+            match = Objects.equals(target, offhand);
+            enough = amount > Config.secondary_cost;
+
+            return match && enough;
         }
-        return Config.level_requirement <= player.experienceLevel ;
-    }
-    public static boolean is_sneaking(PlayerEntity player)
-    {
-        return player.isSneaking();
-    }
-    public static boolean is_damaged(ItemStack item)
-    {
-        return item.isDamaged();
     }
     public static boolean is_fixable(ItemStack item)
     {
-        return (0 < EnchantmentHelper.getLevel(Enchantments.MENDING, item) &&  Config.maximum_durability <= get_damage(item));
+        if (item.isDamaged()) {
+            int durability = (int) (100 * (1 - (((float) get_damage(item)) / ((float) item.getMaxDamage()))));
+            return (0 < EnchantmentHelper.getLevel(Enchantments.MENDING, item) && durability < Config.repair_limit);
+        }
+        return false;
     }
     public static void play_sfx(PlayerEntity player)
     {

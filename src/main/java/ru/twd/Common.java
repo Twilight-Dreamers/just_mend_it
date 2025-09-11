@@ -2,23 +2,20 @@ package ru.twd;
 
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.util.Util;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Objects;
 
 public class Common {
     public static final String MOD_ID = "just_mend_it";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
-
-    public static float repair_percent = 20;
-    public static float repair_cost_percent = 33;
-    public static float minimum_repair_level = 8;
-
-
     public static ItemStack get_item(PlayerEntity player) { return player.getActiveItem(); }
     public static int get_damage(ItemStack item)
     {
@@ -30,7 +27,7 @@ public class Common {
     }
     public static float get_repair_amount(ItemStack item)
     {
-        return ((0.01f*repair_percent)*get_durability(item));
+        return ((0.01f*ru.twd.Config.repairment)*get_durability(item));
     }
     public static void repair(ItemStack item)
     {
@@ -75,7 +72,7 @@ public class Common {
     }
     public static float get_repair_cost(float level)
     {
-        return (  (0.01f*repair_cost_percent) * get_single_level_cost(level)  );
+        return (  (0.01f*ru.twd.Config.cost) * get_single_level_cost(level)  );
     }
     public static float pay(PlayerEntity player)
     {
@@ -110,15 +107,25 @@ public class Common {
     public static boolean mend(PlayerEntity player)
     {
         ItemStack item = player.getMainHandStack();
+        item.setNbt(new NbtCompound().);
+        Util.getMeasuringTimeMs();
         if (!is_fixable(item) || !is_damaged(item) || !is_sneaking(player) || !is_payable(player)) return false;
         pay(player);
         repair(item);
-        player.playSound(SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP,0.75f,1f);
+        play_sfx(player);
         return true;
     }
     public static boolean is_payable(PlayerEntity player)
     {
-        return minimum_repair_level <= player.experienceLevel;
+        String item_name = player.getOffHandStack().getItem().getName().getString();
+        //todo:remove
+        LOGGER.info("secondary_cost_type: " + item_name);
+        LOGGER.info("secondary_cost_type_config: " + Config.secondary_cost_type);
+        if (Config.secondary_cost > 0)
+        {
+            if (!Objects.equals(Config.secondary_cost_type, item_name)) return false;
+        }
+        return Config.level_requirement <= player.experienceLevel ;
     }
     public static boolean is_sneaking(PlayerEntity player)
     {
@@ -130,6 +137,11 @@ public class Common {
     }
     public static boolean is_fixable(ItemStack item)
     {
-        return (0 < EnchantmentHelper.getLevel(Enchantments.MENDING, item));
+        return (0 < EnchantmentHelper.getLevel(Enchantments.MENDING, item) &&  Config.maximum_durability <= get_damage(item));
+    }
+    public static void play_sfx(PlayerEntity player)
+    {
+        player.playSound(SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP,0.75f,1f);
+        player.playSound(SoundEvents.ENTITY_VILLAGER_WORK_TOOLSMITH, 0.35f,1f);
     }
 }

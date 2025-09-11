@@ -5,6 +5,7 @@ import net.fabricmc.fabric.api.event.player.UseItemCallback;
 import net.fabricmc.api.ModInitializer;
 
 
+
 public class Just_mend_it implements ModInitializer {
 	@Override
 	public void onInitialize() {

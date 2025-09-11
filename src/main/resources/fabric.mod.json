@@ -3,9 +3,8 @@
 	"id": "just_mend_it",
 	"version": "${version}",
 	"name": "just_mend_it",
-	"description": "fork of the bettermending mod, with sfx and config support",
+	"description": "rewrite of the bettermending mod, with sfx and config support",
 	"authors": [
-		"legobmw99",
 		"danilanosikov"
 	],
 	"contact": {
@@ -24,6 +23,9 @@
 		],
 		"client": [
 			"ru.twd.Just_mend_itClient"
+		],
+		"modmenu": [
+			"ru.twd.ModMenu"
 		]
 	},
 	"mixins": [
@@ -33,7 +35,8 @@
 		"fabricloader": ">=0.17.2",
 		"minecraft": "~1.20.4",
 		"java": ">=17",
-		"fabric-api": "*"
+		"fabric-api": "*",
+		"midnightlib": ">=1.5.3"
 	},
 	"suggests": {
 		"another-mod": "*"

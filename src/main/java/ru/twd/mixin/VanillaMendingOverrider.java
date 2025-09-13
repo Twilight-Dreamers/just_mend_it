@@ -26,11 +26,17 @@ public abstract class VanillaMendingOverrider {
     }
     private int repair(ItemStack item, int amount)
     {
-        float dmg,fix;
+        float dmg,fix,max,dur;
         dmg=item.getDamage();
         fix=Math.min(dmg,get_repairment(amount));
-        item.setDamage((int)(dmg-fix));
-        return (int)( (((float)amount)/ Config.passive_repair_cost_multiplier) - (fix*Config.passive_repair_cost_multiplier) );
+        max=item.getMaxDamage();
+
+        dur=(max-dmg)/max;
+        if(Config.passive_repair_limit > 100*dur) {
+            item.setDamage((int) (dmg - fix));
+            return (int) ((((float) amount) / Config.passive_repair_cost_multiplier) - (fix * Config.passive_repair_cost_multiplier));
+        }
+        return amount;
     }
 
 

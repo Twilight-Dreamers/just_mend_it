@@ -1,5 +1,6 @@
 {
   "just_mend_it.midnightconfig.category.main_cost": "General Cost",
   "just_mend_it.midnightconfig.category.secondary_cost": "Secondary Cost",
-  "just_mend_it.midnightconfig.category.repairment_attributes": "Repairments"
+  "just_mend_it.midnightconfig.category.repairment_attributes": "Repairments",
+  "just_mend_it.midnightconfig.category.vanilla_behaviour": "Passive Mending"
 }

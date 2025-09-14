@@ -30,7 +30,3 @@ This mod is finished, it will recieve only updates, unless I will come up with n
 
 # Update Schedule
 There is none, mod will be updated every time I will be porting a modpack for my server to newer versions
-
-
-# Videos
-<iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/7DRds1WK9Ag" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
